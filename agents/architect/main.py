@@ -7,7 +7,7 @@ import os
 import sys
 
 from agents.architect.agent import ArchitectAgent
-from agents.shared.llm.anthropic_adapter import AnthropicAdapter
+from agents.shared.llm.openai_adapter import OpenAIAdapter
 from agents.shared.platform.github_adapter import GitHubAdapter
 from agents.shared.registry import Registry
 from agents.shared.state import StateManager
@@ -26,14 +26,14 @@ def _require_env(name: str) -> str:
 
 def main() -> None:
     github_token = _require_env("GITHUB_TOKEN")
-    anthropic_api_key = _require_env("ANTHROPIC_API_KEY")
+    openai_api_key = _require_env("OPENAI_API_KEY")
     repo = _require_env("GITHUB_REPOSITORY")
     event_name = _require_env("GITHUB_EVENT_NAME")
     issue_number = int(_require_env("ISSUE_NUMBER"))
     label_name = os.environ.get("LABEL_NAME", "")
 
     platform = GitHubAdapter(token=github_token)
-    llm = AnthropicAdapter(api_key=anthropic_api_key)
+    llm = OpenAIAdapter(api_key=openai_api_key)
     registry = Registry()
     state_manager = StateManager()
 
