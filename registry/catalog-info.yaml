@@ -1,0 +1,133 @@
+# AI Control Plane — Service Registry
+# Schema version: 1.0
+#
+# Each entry describes a spoke service known to the control plane.
+# Agents use this catalog to resolve service ownership, dependencies,
+# and contract paths when generating cross-service specifications.
+#
+# Field reference:
+#   name            — unique service identifier (kebab-case)
+#   repo            — fully-qualified GitHub repository URL
+#   owner           — team or individual (maps to CODEOWNERS entry)
+#   language        — primary implementation language
+#   framework       — primary framework / runtime
+#   service_type    — api | worker | frontend | library | infrastructure
+#   depends_on      — upstream services this service calls
+#   consumed_by     — downstream services that call this service
+#   events_published — event types this service emits
+#   events_consumed  — event types this service listens for
+#   contract_paths  — paths to OpenAPI spec, event schema, and DB schema within the repo
+#   deployment      — environment, infrastructure constraints, deploy dependencies
+
+schema_version: "1.0"
+
+services:
+  - name: tenant-api
+    repo: https://github.com/lackmannicholas/tenant-api
+    owner: "@lackmannicholas/platform-team"
+    language: Python
+    framework: FastAPI
+    service_type: api
+    depends_on:
+      - billing-api
+      - notifications-service
+    consumed_by:
+      - analytics-pipeline
+    events_published:
+      - lease.created
+      - lease.renewed
+      - lease.terminated
+      - tenant.onboarded
+    events_consumed: []
+    contract_paths:
+      openapi: openapi/tenant-api.yaml
+      event_schema: schemas/events/
+      db_schema: db/models/
+    deployment:
+      environment: production
+      infrastructure: kubernetes
+      deploy_dependencies:
+        - postgres
+        - redis
+
+  - name: billing-api
+    repo: https://github.com/lackmannicholas/billing-api
+    owner: "@lackmannicholas/billing-team"
+    language: Python
+    framework: FastAPI
+    service_type: api
+    depends_on:
+      - tenant-api
+    consumed_by:
+      - analytics-pipeline
+    events_published:
+      - invoice.created
+      - payment.received
+      - payment.failed
+    events_consumed:
+      - lease.renewed
+      - tenant.onboarded
+    contract_paths:
+      openapi: openapi/billing-api.yaml
+      event_schema: schemas/events/
+      db_schema: db/models/
+    deployment:
+      environment: production
+      infrastructure: kubernetes
+      deploy_dependencies:
+        - postgres
+        - stripe
+
+  - name: notifications-service
+    repo: https://github.com/lackmannicholas/notifications-service
+    owner: "@lackmannicholas/platform-team"
+    language: TypeScript
+    framework: Node.js
+    service_type: worker
+    depends_on:
+      - tenant-api
+    consumed_by: []
+    events_published:
+      - notification.sent
+    events_consumed:
+      - lease.renewed
+      - lease.terminated
+      - payment.received
+      - payment.failed
+    contract_paths:
+      openapi: null
+      event_schema: schemas/events/
+      db_schema: null
+    deployment:
+      environment: production
+      infrastructure: kubernetes
+      deploy_dependencies:
+        - sendgrid
+        - twilio
+
+  - name: analytics-pipeline
+    repo: https://github.com/lackmannicholas/analytics-pipeline
+    owner: "@lackmannicholas/data-team"
+    language: Python
+    framework: Apache Airflow
+    service_type: worker
+    depends_on:
+      - tenant-api
+      - billing-api
+    consumed_by: []
+    events_published: []
+    events_consumed:
+      - lease.created
+      - lease.renewed
+      - invoice.created
+      - payment.received
+    contract_paths:
+      openapi: null
+      event_schema: schemas/events/
+      db_schema: db/warehouse/
+    deployment:
+      environment: production
+      infrastructure: kubernetes
+      deploy_dependencies:
+        - postgres
+        - bigquery
