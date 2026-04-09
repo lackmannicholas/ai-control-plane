@@ -53,7 +53,7 @@ class Registry:
 
     def __init__(self, catalog_path: str | Path | None = None) -> None:
         if catalog_path is None:
-            catalog_path = Path(__file__).parents[3] / "registry" / "catalog-info.yaml"
+            catalog_path = Path(__file__).parents[2] / "registry" / "catalog-info.yaml"
         self._path = Path(catalog_path)
         self._services: dict[str, ServiceEntry] = {}
         self._load()
@@ -110,11 +110,7 @@ class Registry:
 
     def services_affected_by_event(self, event_type: str) -> list[ServiceEntry]:
         """Return services that publish *or* consume *event_type*."""
-        return [
-            svc
-            for svc in self._services.values()
-            if event_type in svc.events_published or event_type in svc.events_consumed
-        ]
+        return [svc for svc in self._services.values() if event_type in svc.events_published or event_type in svc.events_consumed]
 
     def downstream_services(self, service_name: str) -> list[ServiceEntry]:
         """Return services that directly depend on *service_name*."""
