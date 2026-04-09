@@ -84,9 +84,7 @@ class ArchitectAgent:
         plan = self._generate_plan(issue, state)
         state.execution_plan.contracts = plan.get("contracts", [])
         state.execution_plan.child_issues = plan.get("child_issues", [])
-        state.execution_plan.migration_flags = [
-            f.get("description", "") for f in plan.get("migration_flags", [])
-        ]
+        state.execution_plan.migration_flags = [f.get("description", "") for f in plan.get("migration_flags", [])]
         self._state.transition(state, "architect_planning")
 
         self._post_execution_plan(issue_number, plan)
@@ -112,10 +110,7 @@ class ArchitectAgent:
 
         state.execution_plan.contracts = revised_plan.get("contracts", [])
         state.execution_plan.child_issues = revised_plan.get("child_issues", [])
-        state.execution_plan.migration_flags = [
-            f.get("description", "") if isinstance(f, dict) else f
-            for f in revised_plan.get("migration_flags", [])
-        ]
+        state.execution_plan.migration_flags = [f.get("description", "") if isinstance(f, dict) else f for f in revised_plan.get("migration_flags", [])]
         self._state.save(state)
         self._post_execution_plan(issue_number, revised_plan)
 
@@ -129,7 +124,9 @@ class ArchitectAgent:
             logger.error("No state found for epic #%d; aborting dispatch.", issue_number)
             return
 
-        self._state.transition(state, "approved")
+        # Support retries: skip transitions that have already been applied.
+        if state.status not in ("approved", "dispatching"):
+            self._state.transition(state, "approved")
         self._platform.add_label(self._repo, issue_number, LABEL_DISPATCHING)
 
         child_issues = state.execution_plan.child_issues
@@ -137,7 +134,8 @@ class ArchitectAgent:
             logger.warning("No child issues in execution plan for epic #%d.", issue_number)
             return
 
-        self._state.transition(state, "dispatching")
+        if state.status != "dispatching":
+            self._state.transition(state, "dispatching")
         self._dispatch_child_issues(issue_number, state, child_issues)
 
     # ------------------------------------------------------------------
@@ -216,30 +214,13 @@ class ArchitectAgent:
         contracts = plan.get("contracts", [])
         migration_flags = plan.get("migration_flags", [])
 
-        child_table_rows = "\n".join(
-            f"| `{ci.get('spoke_repo', '?')}` | {ci.get('title', '?')} |" for ci in child_issues
-        )
-        child_issues_table = (
-            "| Repository | Issue Title |\n|------------|-------------|\n" + child_table_rows
-            if child_table_rows
-            else "_No child issues planned._"
-        )
+        child_table_rows = "\n".join(f"| `{ci.get('spoke_repo', '?')}` | {ci.get('title', '?')} |" for ci in child_issues)
+        child_issues_table = "| Repository | Issue Title |\n|------------|-------------|\n" + child_table_rows if child_table_rows else "_No child issues planned._"
 
-        contracts_summary = (
-            "\n".join(
-                f"- **{c.get('service', '?')}** ({c.get('type', '?')}): {c.get('description', '')}"
-                for c in contracts
-            )
-            or "_No new contracts._"
-        )
+        contracts_summary = "\n".join(f"- **{c.get('service', '?')}** ({c.get('type', '?')}): {c.get('description', '')}" for c in contracts) or "_No new contracts._"
 
         migration_section = (
-            "\n".join(
-                f"- **{f.get('service', '?')}** [{f.get('risk', '?')}]: {f.get('description', '')}"
-                if isinstance(f, dict)
-                else f"- {f}"
-                for f in migration_flags
-            )
+            "\n".join(f"- **{f.get('service', '?')}** [{f.get('risk', '?')}]: {f.get('description', '')}" if isinstance(f, dict) else f"- {f}" for f in migration_flags)
             or "_No migrations required._"
         )
 
@@ -255,12 +236,7 @@ class ArchitectAgent:
 
     def _extract_latest_engineer_comment(self, issue: Issue) -> str:
         """Return the most recent non-bot comment on *issue*."""
-        non_bot = [
-            c
-            for c in reversed(issue.comments)
-            if self._bot_login not in c.get("author", "")
-            and BOT_COMMENT_MARKER not in c.get("body", "")
-        ]
+        non_bot = [c for c in reversed(issue.comments) if self._bot_login not in c.get("author", "") and BOT_COMMENT_MARKER not in c.get("body", "")]
         if non_bot:
             return non_bot[0].get("body", "")
         return ""
