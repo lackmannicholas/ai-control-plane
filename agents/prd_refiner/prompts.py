@@ -76,8 +76,9 @@ The PM has just responded. Review their answer and either:
 }}
 ```
 
-If asking a question, post a normal markdown comment. Do NOT include JSON unless the \
-spec is complete.
+If asking a question, post a normal markdown comment. Do NOT include any JSON (even \
+partial or malformed) unless the spec is complete and you are returning the exact \
+structure above.
 """
 
 SPEC_COMPLETE_COMMENT = """## ✅ Specification Complete

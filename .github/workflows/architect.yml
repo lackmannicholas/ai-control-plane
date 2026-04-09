@@ -10,6 +10,9 @@ jobs:
   architect:
     name: Run Architect Agent
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
 
     # Run when:
     #   - "architect-ready" label applied (begin planning)

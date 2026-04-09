@@ -21,7 +21,7 @@ Each `epic_states/<issue_number>.json` file follows this structure:
 ```json
 {
   "epic_id": 42,
-  "repo": "lackmannicholas/ai-control-plane",
+  "repo": "org/ai-control-plane",
   "title": "Bulk lease renewals",
   "status": "refining | spec_ready | architect_planning | approved | dispatching | in_progress | completed | failed",
   "created_at": "2024-01-01T00:00:00Z",
@@ -42,7 +42,7 @@ Each `epic_states/<issue_number>.json` file follows this structure:
   "dispatch_records": [
     {
       "key": "<epic_id>:<spoke_repo>:<task_hash>",
-      "spoke_repo": "lackmannicholas/tenant-api",
+      "spoke_repo": "org/tenant-api",
       "issue_number": null,
       "status": "pending | created | failed",
       "created_at": null,
@@ -50,7 +50,7 @@ Each `epic_states/<issue_number>.json` file follows this structure:
     }
   ],
   "spoke_statuses": {
-    "lackmannicholas/tenant-api": {
+    "org/tenant-api": {
       "child_issue_number": 45,
       "status": "pending | in_progress | completed | failed",
       "pr_number": null,

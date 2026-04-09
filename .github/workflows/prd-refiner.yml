@@ -10,6 +10,9 @@ jobs:
   prd-refiner:
     name: Run PRD Refiner
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
 
     # Only run when:
     #   - an issue is labeled "epic" (initial trigger), OR
