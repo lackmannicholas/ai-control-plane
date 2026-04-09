@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   architect:
-    if: false
     name: Run Architect Agent
     runs-on: ubuntu-latest
     permissions:

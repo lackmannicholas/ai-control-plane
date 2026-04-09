@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   prd-refiner:
-    if: false
     name: Run PRD Refiner
     runs-on: ubuntu-latest
     permissions:
