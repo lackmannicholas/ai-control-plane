@@ -45,7 +45,7 @@ jobs:
 
       - name: Run PRD Refiner Agent
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ORCHESTRATOR_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: https://us.api.openai.com/v1
           GITHUB_REPOSITORY: ${{ github.repository }}
