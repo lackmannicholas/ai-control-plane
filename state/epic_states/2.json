@@ -2,9 +2,9 @@
   "epic_id": 2,
   "repo": "lackmannicholas/ai-control-plane",
   "title": "Epic: New Food Field for float plan",
-  "status": "dispatching",
+  "status": "in_progress",
   "created_at": "2026-04-09T22:28:45.018213+00:00",
-  "updated_at": "2026-04-09T22:32:04.351347+00:00",
+  "updated_at": "2026-04-09T22:38:44.821836+00:00",
   "spec": {
     "acceptance_criteria": [
       "The float-plan frontend allows users to optionally input a 'Food' field with a maximum of 500 characters.",
@@ -90,6 +90,23 @@
       "Migration required: Add a new 'food' column to the float plan database table, optional with max 500 characters."
     ]
   },
-  "dispatch_records": [],
+  "dispatch_records": [
+    {
+      "key": "2:lackmannicholas/float_plan:7ba51e1769a9",
+      "spoke_repo": "lackmannicholas/float_plan",
+      "issue_number": 2,
+      "status": "created",
+      "created_at": "2026-04-09T22:38:44.366149+00:00",
+      "retry_count": 0
+    },
+    {
+      "key": "2:lackmannicholas/float_plan_api:2f3fd11174d6",
+      "spoke_repo": "lackmannicholas/float_plan_api",
+      "issue_number": 4,
+      "status": "created",
+      "created_at": "2026-04-09T22:38:44.821057+00:00",
+      "retry_count": 0
+    }
+  ],
   "spoke_statuses": {}
 }
