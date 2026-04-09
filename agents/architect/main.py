@@ -27,13 +27,14 @@ def _require_env(name: str) -> str:
 def main() -> None:
     github_token = _require_env("GITHUB_TOKEN")
     openai_api_key = _require_env("OPENAI_API_KEY")
+    openai_base_url = os.environ.get("OPENAI_BASE_URL", "https://us.api.openai.com/v1")
     repo = _require_env("GITHUB_REPOSITORY")
     event_name = _require_env("GITHUB_EVENT_NAME")
     issue_number = int(_require_env("ISSUE_NUMBER"))
     label_name = os.environ.get("LABEL_NAME", "")
 
     platform = GitHubAdapter(token=github_token)
-    llm = OpenAIAdapter(api_key=openai_api_key)
+    llm = OpenAIAdapter(api_key=openai_api_key, base_url=openai_base_url)
     registry = Registry()
     state_manager = StateManager()
 

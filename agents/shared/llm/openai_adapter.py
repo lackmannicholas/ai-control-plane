@@ -19,8 +19,9 @@ class OpenAIAdapter(LLMInterface):
         self,
         api_key: str | None = None,
         model: str = "gpt-4o",
+        base_url: str | None = None,
     ) -> None:
-        self._client = OpenAI(api_key=api_key)
+        self._client = OpenAI(api_key=api_key, base_url=base_url)
         self._model = model
 
     def complete(
