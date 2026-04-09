@@ -2,9 +2,9 @@
   "epic_id": 2,
   "repo": "lackmannicholas/ai-control-plane",
   "title": "Epic: New Food Field for float plan",
-  "status": "spec_ready",
+  "status": "architect_planning",
   "created_at": "2026-04-09T22:28:45.018213+00:00",
-  "updated_at": "2026-04-09T22:28:47.742573+00:00",
+  "updated_at": "2026-04-09T22:30:40.021708+00:00",
   "spec": {
     "acceptance_criteria": [
       "The float-plan frontend allows users to optionally input a 'Food' field with a maximum of 500 characters.",
@@ -27,9 +27,68 @@
     "open_questions": []
   },
   "execution_plan": {
-    "contracts": [],
-    "child_issues": [],
-    "migration_flags": []
+    "contracts": [
+      {
+        "service": "float-plan-api",
+        "type": "openapi",
+        "description": "Add 'food' as an optional text field with a max length of 500 characters to all relevant API endpoints.",
+        "contract_fragment": {
+          "paths": {
+            "/float-plan": {
+              "post": {
+                "parameters": [
+                  {
+                    "name": "food",
+                    "in": "body",
+                    "description": "Optional food details",
+                    "required": false,
+                    "schema": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                ]
+              },
+              "put": {
+                "parameters": [
+                  {
+                    "name": "food",
+                    "in": "body",
+                    "description": "Optional food details update",
+                    "required": false,
+                    "schema": {
+                      "type": "string",
+                      "maxLength": 500
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ],
+    "child_issues": [
+      {
+        "spoke_repo": "lackmannicholas/float_plan",
+        "title": "Implement 'Food' field in float-plan frontend",
+        "body": "### Description\nImplement the optional 'Food' field on the float-plan frontend, allowing users to input up to 500 characters. Display this field in both the summary and detail views of the float plan.\n\n### Acceptance Criteria\n- The user can input an optional 'Food' field with a maximum of 500 characters.\n- The field is displayed on the float plan summary and detail views.\n- No special processing or transformation is required for displaying this field.\n\n### Relevant Registry Links\n- [float-plan Repository](https://github.com/lackmannicholas/float_plan)\n- Depends on [float-plan-api](https://github.com/lackmannicholas/float_plan_api)",
+        "labels": [
+          "arch-task"
+        ]
+      },
+      {
+        "spoke_repo": "lackmannicholas/float_plan_api",
+        "title": "Update float-plan-api to support 'Food' field",
+        "body": "### Description\nEnhance the float-plan-api to accept an optional 'Food' field in the relevant endpoints, with a maximum length of 500 characters.\n\n### Contract Changes\n```json\n{\n  \"paths\": {\n    \"/float-plan\": {\n      \"post\": {\n        \"parameters\": [\n          {\n            \"name\": \"food\",\n            \"in\": \"body\",\n            \"description\": \"Optional food details\",\n            \"required\": false,\n            \"schema\": {\n              \"type\": \"string\",\n              \"maxLength\": 500\n            }\n          }\n        ]\n      },\n      \"put\": {\n        \"parameters\": [\n          {\n            \"name\": \"food\",\n            \"in\": \"body\",\n            \"description\": \"Optional food details update\",\n            \"required\": false,\n            \"schema\": {\n              \"type\": \"string\",\n              \"maxLength\": 500\n            }\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\n### Acceptance Criteria\n- The API must accept the 'Food' field in POST and PUT operations as an optional field with a max length of 500 characters.\n- The API must handle cases where the 'Food' field is omitted gracefully.\n\n### Relevant Registry Links\n- [float-plan-api Repository](https://github.com/lackmannicholas/float_plan_api)\n- Consumed by [float-plan](https://github.com/lackmannicholas/float_plan)",
+        "labels": [
+          "arch-task"
+        ]
+      }
+    ],
+    "migration_flags": [
+      "Migration required: Add a new 'food' column to the float plan database table, optional with max 500 characters."
+    ]
   },
   "dispatch_records": [],
   "spoke_statuses": {}
