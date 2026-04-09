@@ -29,7 +29,7 @@ services:
     framework: React
     service_type: frontend
     depends_on: 
-      - name: float-plan-api
+      - float-plan-api
     consumed_by: []
     events_published: []
     events_consumed: []
