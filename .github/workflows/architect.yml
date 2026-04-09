@@ -56,10 +56,11 @@ jobs:
         run: python -m agents.architect.main
 
       - name: Commit and Push State
+        if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(state): Update orchestration state for Epic #${{ github.event.issue.number }}"
-          file_pattern: "state/**/*.json state/**/*.jsonl"
+          file_pattern: "state/"
           commit_user_name: "ai-control-plane-bot"
           commit_user_email: "ai-bot@proptech-domain.internal"
           branch: main
