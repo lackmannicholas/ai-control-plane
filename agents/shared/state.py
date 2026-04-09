@@ -98,7 +98,7 @@ class StateManager:
 
     def __init__(self, state_dir: str | Path | None = None) -> None:
         if state_dir is None:
-            state_dir = Path(__file__).parents[3] / "state"
+            state_dir = Path(__file__).parents[2] / "state"
         self._state_dir = Path(state_dir)
         self._epics_dir = self._state_dir / "epic_states"
         self._dispatch_log = self._state_dir / "dispatch_log.jsonl"
@@ -121,9 +121,7 @@ class StateManager:
         data["spec"] = EpicSpec(**data.get("spec", {}))
         data["execution_plan"] = ExecutionPlan(**data.get("execution_plan", {}))
         data["dispatch_records"] = [DispatchRecord(**r) for r in data.get("dispatch_records", [])]
-        data["spoke_statuses"] = {
-            k: SpokeStatus(**v) for k, v in data.get("spoke_statuses", {}).items()
-        }
+        data["spoke_statuses"] = {k: SpokeStatus(**v) for k, v in data.get("spoke_statuses", {}).items()}
         return EpicState(**data)
 
     # ------------------------------------------------------------------
@@ -169,11 +167,7 @@ class StateManager:
         """Transition *state* to *new_status*, raising ValueError if invalid."""
         allowed = _VALID_TRANSITIONS.get(state.status, set())
         if new_status not in allowed:
-            raise ValueError(
-                f"Cannot transition epic {state.epic_id} from "
-                f"'{state.status}' to '{new_status}'. "
-                f"Allowed: {allowed}"
-            )
+            raise ValueError(f"Cannot transition epic {state.epic_id} from " f"'{state.status}' to '{new_status}'. " f"Allowed: {allowed}")
         state.status = new_status
         self.save(state)
 
