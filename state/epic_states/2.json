@@ -1,0 +1,23 @@
+{
+  "epic_id": 2,
+  "repo": "lackmannicholas/ai-control-plane",
+  "title": "Epic: New Food Field for float plan",
+  "status": "refining",
+  "created_at": "2026-04-09T21:15:14.996321+00:00",
+  "updated_at": "2026-04-09T21:15:14.996321+00:00",
+  "spec": {
+    "acceptance_criteria": [],
+    "affected_services": [],
+    "data_model_changes": [],
+    "api_contract_changes": [],
+    "edge_cases": [],
+    "open_questions": []
+  },
+  "execution_plan": {
+    "contracts": [],
+    "child_issues": [],
+    "migration_flags": []
+  },
+  "dispatch_records": [],
+  "spoke_statuses": {}
+}
