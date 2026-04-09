@@ -1,0 +1,35 @@
+name: Registry Sync Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "registry/**"
+  pull_request:
+    paths:
+      - "registry/**"
+
+jobs:
+  validate-registry:
+    name: Validate Service Registry
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout hub repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate catalog-info.yaml schema
+        run: python -m agents.shared.registry --validate
+
+      - name: Check dependency graph consistency
+        run: python scripts/validate_registry.py

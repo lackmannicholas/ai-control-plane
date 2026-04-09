@@ -1,0 +1,49 @@
+name: Architect Agent
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  architect:
+    name: Run Architect Agent
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    # Run when:
+    #   - "architect-ready" label applied (begin planning)
+    #   - "approved-for-dispatch" label applied (create child issues)
+    #   - non-bot comment on an issue with "architect-planning" label
+    if: >
+      (github.event_name == 'issues' &&
+       (github.event.label.name == 'architect-ready' ||
+        github.event.label.name == 'approved-for-dispatch')) ||
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.issue.labels.*.name, 'architect-planning') &&
+       github.event.comment.user.type != 'Bot')
+
+    steps:
+      - name: Checkout hub repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Architect Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          LABEL_NAME: ${{ github.event.label.name }}
+        run: python -m agents.architect.main

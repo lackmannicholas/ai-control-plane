@@ -1,0 +1,48 @@
+name: PRD Refiner Agent
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  prd-refiner:
+    name: Run PRD Refiner
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    # Only run when:
+    #   - an issue is labeled "epic" (initial trigger), OR
+    #   - a comment is created on an issue that has both "epic" and "refining" labels
+    if: >
+      (github.event_name == 'issues' &&
+       github.event.label.name == 'epic') ||
+      (github.event_name == 'issue_comment' &&
+       contains(github.event.issue.labels.*.name, 'epic') &&
+       contains(github.event.issue.labels.*.name, 'refining') &&
+       github.event.comment.user.type != 'Bot')
+
+    steps:
+      - name: Checkout hub repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run PRD Refiner Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          LABEL_NAME: ${{ github.event.label.name }}
+        run: python -m agents.prd_refiner.main
