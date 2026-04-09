@@ -6,12 +6,16 @@ on:
   issue_comment:
     types: [created]
 
+concurrency:
+  group: epic-state-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
 jobs:
   prd-refiner:
     name: Run PRD Refiner
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       issues: write
 
     # Only run when:
@@ -28,6 +32,8 @@ jobs:
     steps:
       - name: Checkout hub repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ORCHESTRATOR_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -46,3 +52,13 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           LABEL_NAME: ${{ github.event.label.name }}
         run: python -m agents.prd_refiner.main
+
+      - name: Commit and Push State
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(state): Update orchestration state for Epic #${{ github.event.issue.number }}"
+          file_pattern: "state/**/*.json state/**/*.jsonl"
+          commit_user_name: "ai-control-plane-bot"
+          commit_user_email: "ai-bot@proptech-domain.internal"
+          branch: main
+          push_options: "--force-with-lease"
